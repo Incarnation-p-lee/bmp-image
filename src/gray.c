@@ -13,11 +13,10 @@
 
 #include "bmp_format.h"
 #include "gray.h"
+#include "udglobal.h"
 
 signed int gray(unsigned char *bmp_in,unsigned char *bmp_out)
 {
-	struct BMP_file_head bfh;
-	struct BMP_info_head bih;
 	unsigned int md_len = 0;
 	unsigned int index = 0;
 
