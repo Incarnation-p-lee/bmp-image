@@ -7,6 +7,7 @@
 
 #ifndef BMP_FORMAT_H
 #define BMP_FORMAT_H
+#define HEAD_SIZE 54
 
 typedef struct BMP_file_head{
 	unsigned short type;

@@ -12,8 +12,8 @@
 #define pGREEN 0.587
 #define pBLUE 0.299
 
-signed int gray(unsigned char *,unsigned char *);
-static void bmp_gl(unsigned char *,unsigned char *,unsigned int,unsigned int);
+signed int gray(unsigned char *,const unsigned char *);
+static void bmp_gl(unsigned char *,const unsigned char *,unsigned int,unsigned int);
 
 #endif
 

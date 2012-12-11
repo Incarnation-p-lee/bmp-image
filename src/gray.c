@@ -14,40 +14,43 @@
 #include "bmp_format.h"
 #include "gray.h"
 #include "udglobal.h"
+#include "externs.h"
 
-signed int gray(unsigned char *bmp_in,unsigned char *bmp_out)
+/*
+* out-		output image
+* in-		input image
+*/
+signed int gray(unsigned char *bmp_out,const unsigned char *bmp_in)
 {
-	unsigned int md_len = 0;
-	unsigned int index = 0;
-
-	bfh.type = CTV(bmp_in[0],bmp_in[1]);
-	index = 2;
-	memcpy(&bfh.size,&bmp_in[index],
-		sizeof(struct BMP_file_head)-sizeof(unsigned int));
-	index += sizeof(struct BMP_file_head)-sizeof(unsigned int);
-	memcpy(&bih,&bmp_in[index],sizeof(struct BMP_info_head));
-	index += sizeof(struct BMP_info_head);
-
-	memcpy(bmp_out,bmp_in,index);
-	md_len = bih.width * bih.height;
+	head_read(bmp_in);
+	head_cpy(bmp_out,bmp_in);
 
 	if(24==bih.bitcount)	/* 24 bits BMP */
-		bmp_gl(bmp_out,bmp_in,index,md_len);
+		bmp_gl(bmp_out,bmp_in,bfh.offBits,bih.width*bih.height);
 
 	if(1==bih.bitcount || 4==bih.bitcount || 8==bih.bitcount)	/* other color BMP */
 	{
-		bmp_gl(bmp_out,bmp_in,index,BITCOUNT(bih.bitcount));
-		index += (unsigned int)BITCOUNT(bih.bitcount);
-		memcpy(&bmp_out[index],&bmp_in[index],md_len);
+		bmp_gl(bmp_out,
+				bmp_in,
+				bfh.offBits-BITCOUNT(bih.bitcount),
+				BITCOUNT(bih.bitcount));
+		memcpy(&bmp_out[bfh.offBits],&bmp_in[bfh.offBits],bih.width*bih.height);
 	}
 
 	return 0;
 }
 
-static void bmp_gl(unsigned char *out,unsigned char *in,unsigned int index,unsigned int length)
+/*
+* out-		output image
+* in-		input image
+* index-	where data begins, bytes
+* length-	how many pixels it will handle, 
+*/
+static void bmp_gl(unsigned char *out,const unsigned char *in,unsigned int index,unsigned int length)
 {
 	int i = 0;
 	unsigned char rgb_tmp;
+
 	while(i<length)
 	{
 		rgb_tmp = (unsigned char)(

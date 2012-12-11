@@ -15,22 +15,17 @@
 #include "bmp_format.h"
 #include "gradient.h"
 #include "udglobal.h"
+#include "externs.h"
   
 
-signed int gradient(unsigned char *bmp_in,unsigned char *bmp_out)
+signed int gradient(unsigned char *bmp_out,const unsigned char *bmp_in,unsigned char director)
 {
-	unsigned int begin;
-	/*length = bih.width * bih.height;
-		length = BITCOUNT(bih.bitcount);*/
-
-	if(24==bih.bitcount)	/* 24 bits BMP */
-		begin = sizeof(struct BMP_file_head) + sizeof(struct BMP_info_head);
-
-	if(1==bih.bitcount || 4==bih.bitcount || 8==bih.bitcount)	/* other color BMP */
-		begin = sizeof(struct BMP_file_head) + sizeof(struct BMP_info_head) + BITCOUNT(bih.bitcount);
-
-	begin -= 2;
-	gdt_xy(bmp_out,bmp_in,begin,0);
+	head_cpy(bmp_out,bmp_in);
+	
+	if(24!=bih.bitcount)
+		memcpy(bmp_out,bmp_in,bfh.offBits - HEAD_SIZE);
+	
+	gdt_xy(bmp_out,bmp_in,director);
 
 	return 0;
 }
@@ -39,7 +34,7 @@ signed int gradient(unsigned char *bmp_in,unsigned char *bmp_out)
 * flag = 0x55,x directory
 * flag = 0xaa,y directory
 */
-static void gdt_xy(unsigned char *out,unsigned char *in,unsigned int begin,unsigned int flag)
+static void gdt_xy(unsigned char *out,const unsigned char *in,unsigned char director)
 {
 	unsigned int handle_h = bih.height - 2;
 	unsigned int handle_w = bih.width - 2;
@@ -51,12 +46,16 @@ static void gdt_xy(unsigned char *out,unsigned char *in,unsigned int begin,unsig
 	{
 		while(j<handle_w)
 		{
-			tmp = (unsigned char)sqrt(pow(matrix(in,begin,i,j,XD),2)+
-				 pow(matrix(in,begin,i,j,YD),2));
-			rst = INDEX(begin,bih.width,i,j);
-			out[INDEX(begin,bih.width,i,j)] = tmp;
-			out[INDEX(begin,bih.width,i,j)+1] = tmp;
-			out[INDEX(begin,bih.width,i,j)+2] = tmp;
+#if 1
+			tmp = (unsigned char)sqrt(pow(matrix(in,i,j,XD),2)+
+				 pow(matrix(in,i,j,YD),2));
+#else
+			tmp = (unsigned char)abs(matrix(in,i,j,XD)) + abs(matrix(in,i,j,YD));
+#endif
+			rst = point_to_bytes(i,j);
+			out[point_to_bytes(i,j)] = tmp;
+			out[point_to_bytes(i,j)+1] = tmp;
+			out[point_to_bytes(i,j)+2] = tmp;
 			j++;
 		}
 		i++;
@@ -65,21 +64,28 @@ static void gdt_xy(unsigned char *out,unsigned char *in,unsigned int begin,unsig
 	return;
 }
 
-static signed char matrix(unsigned char *in,unsigned int begin,int i,int j,unsigned int flag)
+
+static unsigned int point_to_bytes(unsigned int i,unsigned int j)
+{
+	return (unsigned int)(bfh.offBits + (bih.width*(i+1) + j + 1)*(bih.bitcount>>3));
+}
+
+
+static signed char matrix(const unsigned char *in,unsigned int i,unsigned int j,unsigned char director)
 {
 	signed char result = 0;
-	if(0x55==flag)
+	if(0x55==director)
 	{
-		result = Sx[0][2]*in[INDEX(begin,bih.width,i-1,j+1)] - Sx[0][0]*in[INDEX(begin,bih.width,i-1,j-1)]+
-			2*Sx[1][2]*in[INDEX(begin,bih.width,i,j+1)] - 2*Sx[1][0]*in[INDEX(begin,bih.width,i,j-1)]+ 
-			Sx[2][2]*in[INDEX(begin,bih.width,i+1,j+1)] - Sx[2][0]*in[INDEX(begin,bih.width,i+1,j-1)];
+		result = Sx[0][2]*in[point_to_bytes(i-1,j+1)] + Sx[0][0]*in[point_to_bytes(i-1,j-1)]+
+			Sx[1][2]*in[point_to_bytes(i,j+1)] + Sx[1][0]*in[point_to_bytes(i,j-1)]+ 
+			Sx[2][2]*in[point_to_bytes(i+1,j+1)] + Sx[2][0]*in[point_to_bytes(i+1,j-1)];
 	}
 
-	if(0xAA==flag)	
+	if(0xAA==director)	
 	{
-		result = Sy[2][0]*in[INDEX(begin,bih.width,i-1,j-1)] - Sy[0][0]*in[INDEX(begin,bih.width,i+1,j-1)]+
-			2*Sy[1][0]*in[INDEX(begin,bih.width,i-1,j-1)] - 2*Sy[0][1]*in[INDEX(begin,bih.width,i+1,j)]+
-			Sy[2][0]*in[INDEX(begin,bih.width,i-1,j-1)] - Sy[2][2]*in[INDEX(begin,bih.width,i+1,j+1)];
+		result = Sy[2][0]*in[point_to_bytes(i+1,j-1)] + Sy[0][0]*in[point_to_bytes(i-1,j-1)]+
+			Sy[2][1]*in[point_to_bytes(i+1,j)] + Sy[0][1]*in[point_to_bytes(i-1,j)]+
+			Sy[2][2]*in[point_to_bytes(i+1,j+1)] + Sy[0][2]*in[point_to_bytes(i-1,j+1)];
 	}
 
 	return result;
