@@ -22,25 +22,71 @@
 */
 signed int gray(unsigned char *bmp_out,const unsigned char *bmp_in)
 {
+	unsigned char *colors;
+	int i = 0;
 	head_read(bmp_in);
-	head_cpy(bmp_out,bmp_in);
-
-	if(24==bih.bitcount)	/* 24 bits BMP */
-		bmp_gl(bmp_out,bmp_in,bfh.offBits,bih.width*bih.height);
 
 	if(1==bih.bitcount || 4==bih.bitcount || 8==bih.bitcount)	/* other color BMP */
 	{
-		bmp_gl(bmp_out,
-				bmp_in,
-				bfh.offBits-BITCOUNT(bih.bitcount),
-				BITCOUNT(bih.bitcount));
-		memcpy(&bmp_out[bfh.offBits],&bmp_in[bfh.offBits],bih.width*bih.height);
+		bmp_gl(	bmp_out,
+			bmp_in,
+			bfh.offBits-BITCOUNT(bih.bitcount),
+			BITCOUNT(bih.bitcount));
+		memcpy(	&bmp_out[bfh.offBits],
+			&bmp_in[bfh.offBits],
+			bih.width*bih.height*(bih.bitcount>>3));
 	}
+
+	if(24==bih.bitcount)	/* 24 bits BMP, first convert to 8bits BMP */
+	{
+		colors = malloc(sizeof(struct BMP_colors)*CCOUNT8);
+		bfh.offBits += sizeof(struct BMP_colors)*CCOUNT8;
+
+		while(i<CCOUNT8)	/* build gray color table */ 
+		{
+			colors[4*i] = i;	
+			colors[4*i+1] = i;	
+			colors[4*i+2] = i;	
+			colors[4*i+3] = 0;	
+			i++;
+		}
+
+		memcpy(&bmp_out[HEAD_SIZE],colors,sizeof(struct BMP_colors)*CCOUNT8);
+
+		bfh.size = bfh.offBits + bih.width*bih.height;
+		bih.bitcount = 8;
+
+		bmp_ct(bmp_out,bmp_in,bfh.offBits,bih.width*bih.height);
+		free(colors);
+	}
+
+
+	head_cpy(bmp_out);
 
 	return 0;
 }
 
 /*
+* convert 24bits BMP to 8 bits gray BMP
+*/
+static void bmp_ct(unsigned char *out,const unsigned char *in,unsigned int index,unsigned int length)
+{
+	int i = 0;
+	unsigned int b_in = HEAD_SIZE;
+
+	while(i++<length)
+	{
+		out[index++] = (unsigned char)(
+				pRED*in[b_in] +
+				pGREEN*in[b_in+1] +
+				pBLUE*in[b_in+2]);
+		b_in += 3;
+	}
+	return;
+}
+
+/*
+* gray change the color table
 * out-		output image
 * in-		input image
 * index-	where data begins, bytes
@@ -57,14 +103,12 @@ static void bmp_gl(unsigned char *out,const unsigned char *in,unsigned int index
 				pRED*in[index] +
 				pGREEN*in[index+1] +
 				pBLUE*in[index+2]);
+
 		out[index] = rgb_tmp;	/* R gray */
 		out[index+1] = rgb_tmp;	/* R gray */
 		out[index+2] = rgb_tmp;	/* B gray */
 		
-		if(1==length || 4==length || 8==length)	/* other color BMP */
-			index += 4;
-		else
-			index += 3;
+		index += 4;
 		i++;	
 	}
 	return;

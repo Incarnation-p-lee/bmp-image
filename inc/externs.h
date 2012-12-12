@@ -10,7 +10,7 @@
 
 extern signed int gray(unsigned char *,const unsigned char *);
 extern signed int gradient(unsigned char *,const unsigned char *,unsigned char);
-extern void head_cpy(unsigned char*,const unsigned char*);
+extern void head_cpy(unsigned char*);
 extern void head_read(const unsigned char*);
 
 #endif

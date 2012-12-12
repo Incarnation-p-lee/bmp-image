@@ -11,7 +11,7 @@
 
 #include "udglobal.h"
 
-void head_cpy(unsigned char*,const unsigned char*);
+void head_cpy(unsigned char*);
 void head_read(const unsigned char*);
 
 #endif

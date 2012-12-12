@@ -8,6 +8,7 @@
 #ifndef BMP_FORMAT_H
 #define BMP_FORMAT_H
 #define HEAD_SIZE 54
+#define CCOUNT8 256
 
 typedef struct BMP_file_head{
 	unsigned short type;
@@ -32,9 +33,9 @@ typedef struct BMP_info_head{
 }Bi_head;
 		
 typedef struct BMP_colors{
-	unsigned char r;
-	unsigned char g;
 	unsigned char b;
+	unsigned char g;
+	unsigned char r;
 	unsigned char reserved;
 }b_color;
 

@@ -14,6 +14,7 @@
 
 signed int gray(unsigned char *,const unsigned char *);
 static void bmp_gl(unsigned char *,const unsigned char *,unsigned int,unsigned int);
+static void bmp_ct(unsigned char *,const unsigned char *,unsigned int,unsigned int);
 
 #endif
 

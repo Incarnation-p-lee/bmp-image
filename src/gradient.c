@@ -20,7 +20,7 @@
 
 signed int gradient(unsigned char *bmp_out,const unsigned char *bmp_in,unsigned char director)
 {
-	head_cpy(bmp_out,bmp_in);
+	head_cpy(bmp_out);
 	
 	if(24!=bih.bitcount)
 		memcpy(bmp_out,bmp_in,bfh.offBits - HEAD_SIZE);
@@ -38,24 +38,14 @@ static void gdt_xy(unsigned char *out,const unsigned char *in,unsigned char dire
 {
 	unsigned int handle_h = bih.height - 2;
 	unsigned int handle_w = bih.width - 2;
-	unsigned char tmp;
-	unsigned int rst;
 	int i = 0,j = 0;
 	
 	while(i<handle_h)
 	{
 		while(j<handle_w)
 		{
-#if 1
-			tmp = (unsigned char)sqrt(pow(matrix(in,i,j,XD),2)+
+			out[point_to_bytes(i,j)] = (unsigned char)sqrt(pow(matrix(in,i,j,XD),2)+
 				 pow(matrix(in,i,j,YD),2));
-#else
-			tmp = (unsigned char)abs(matrix(in,i,j,XD)) + abs(matrix(in,i,j,YD));
-#endif
-			rst = point_to_bytes(i,j);
-			out[point_to_bytes(i,j)] = tmp;
-			out[point_to_bytes(i,j)+1] = tmp;
-			out[point_to_bytes(i,j)+2] = tmp;
 			j++;
 		}
 		i++;

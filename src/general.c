@@ -16,12 +16,14 @@
 #include "udglobal.h"
 
 
-void head_cpy(unsigned char *out,const unsigned char *in)
+void head_cpy(unsigned char *out)
 {
-	if(NULL==out||NULL==in)
+	if(NULL==out)
 		return;
 	
-	memcpy(out,in,bfh.offBits);
+	memcpy(out,&bfh.type,sizeof(bfh.type));
+	memcpy(&out[sizeof(bfh.type)],&bfh.size,sizeof(bfh)-sizeof(bfh.type)-2);
+	memcpy(&out[sizeof(bfh)-2],&bih,sizeof(bih));
 	return;
 }
 
@@ -29,7 +31,7 @@ void head_read(const unsigned char *bmp_in)
 {
 	unsigned int index = 0;
 
-	bfh.type = CTV(bmp_in[0],bmp_in[1]);
+	bfh.type = CTV(bmp_in[1],bmp_in[0]);
 	index = 2;
 	memcpy(&bfh.size,&bmp_in[index],
 		sizeof(struct BMP_file_head)-sizeof(unsigned int));

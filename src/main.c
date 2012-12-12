@@ -12,6 +12,7 @@
 #include <limits.h>
 
 #include "externs.h"
+#include "udglobal.h"
 
 
 int main()
@@ -23,10 +24,10 @@ int main()
 	unsigned char *grad_bmp;
 
 	/*fpi = fopen("/home/pli/workspace/c-program/bmp/source/1.bmp","rb");*/
-#if 1
-	fpi = fopen("./source/3.bmp","rb");
-	fpo = fopen("./source/3.gray.bmp","wb");
-	fpg = fopen("./source/3.grad.bmp","wb");
+#if 0
+	fpi = fopen("./source/1.bmp","rb");
+	fpo = fopen("./source/1.gray.bmp","wb");
+	fpg = fopen("./source/1.grad.bmp","wb");
 #else
 	fpi = fopen("./source/2.bmp","rb");
 	fpo = fopen("./source/2.gray.bmp","wb");
@@ -43,10 +44,10 @@ int main()
 	fread(buf,length,1,fpi);
 
 	gray(gray_bmp,buf);					/* gray bmp */
-	fwrite(gray_bmp,length,1,fpo);
+	fwrite(gray_bmp,bfh.size,1,fpo);
 
 	gradient(grad_bmp,gray_bmp,0);		/* gradient, edger detector */
-	fwrite(grad_bmp,length,1,fpg);
+	fwrite(grad_bmp,bfh.size,1,fpg);
 
 
 	fclose(fpi);
