@@ -61,9 +61,9 @@ static unsigned int point_to_bytes(unsigned int i,unsigned int j)
 }
 
 
-static signed char matrix(const unsigned char *in,unsigned int i,unsigned int j,unsigned char director)
+signed int matrix(const unsigned char *in,unsigned int i,unsigned int j,unsigned char director)
 {
-	signed char result = 0;
+	signed int result = 0;
 	if(0x55==director)
 	{
 		result = Sx[0][2]*in[point_to_bytes(i-1,j+1)] + Sx[0][0]*in[point_to_bytes(i-1,j-1)]+

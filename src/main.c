@@ -50,6 +50,9 @@ int main()
 	fwrite(grad_bmp,bfh.size,1,fpg);
 
 
+	corner(gray_bmp);
+
+
 	fclose(fpi);
 	fclose(fpo);
 	fclose(fpg);

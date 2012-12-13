@@ -10,6 +10,8 @@
 
 #include "bmp_format.h"
 
+#define XD 0x55
+#define YD 0xAA
 
 #define BITCOUNT(n)	((unsigned int)1<<(n))
 
