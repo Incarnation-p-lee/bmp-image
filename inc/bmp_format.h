@@ -7,6 +7,9 @@
 
 #ifndef BMP_FORMAT_H
 #define BMP_FORMAT_H
+#define BITS_1	1
+#define BITS_4	4
+#define BITS_8	8
 #define HEAD_SIZE 54
 #define CCOUNT8 256
 

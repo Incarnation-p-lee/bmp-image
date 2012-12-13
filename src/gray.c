@@ -26,7 +26,7 @@ signed int gray(unsigned char *bmp_out,const unsigned char *bmp_in)
 	int i = 0;
 	head_read(bmp_in);
 
-	if(1==bih.bitcount || 4==bih.bitcount || 8==bih.bitcount)	/* other color BMP */
+	if(BITS_1==bih.bitcount || BITS_4==bih.bitcount || BITS_8==bih.bitcount)	/* other color BMP */
 	{
 		bmp_gl(	bmp_out,
 			bmp_in,
@@ -44,17 +44,17 @@ signed int gray(unsigned char *bmp_out,const unsigned char *bmp_in)
 
 		while(i<CCOUNT8)	/* build gray color table */ 
 		{
-			colors[4*i] = i;	
-			colors[4*i+1] = i;	
-			colors[4*i+2] = i;	
-			colors[4*i+3] = 0;	
+			colors[sizeof(struct BMP_colors)*i] = i;	
+			colors[sizeof(struct BMP_colors)*i+1] = i;	
+			colors[sizeof(struct BMP_colors)*i+2] = i;	
+			colors[sizeof(struct BMP_colors)*i+3] = 0;	
 			i++;
 		}
 
 		memcpy(&bmp_out[HEAD_SIZE],colors,sizeof(struct BMP_colors)*CCOUNT8);
 
 		bfh.size = bfh.offBits + bih.width*bih.height;
-		bih.bitcount = 8;
+		bih.bitcount = BITS_8;
 
 		bmp_ct(bmp_out,bmp_in,bfh.offBits,bih.width*bih.height);
 		free(colors);
@@ -108,7 +108,7 @@ static void bmp_gl(unsigned char *out,const unsigned char *in,unsigned int index
 		out[index+1] = rgb_tmp;	/* R gray */
 		out[index+2] = rgb_tmp;	/* B gray */
 		
-		index += 4;
+		index += sizeof(struct BMP_colors);
 		i++;	
 	}
 	return;
