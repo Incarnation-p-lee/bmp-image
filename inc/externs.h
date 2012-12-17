@@ -13,7 +13,7 @@ extern signed int gradient(unsigned char *,const unsigned char *,unsigned char);
 extern void head_cpy(unsigned char*);
 extern void head_read(const unsigned char*);
 extern signed int matrix(const unsigned char *,unsigned int,unsigned int,unsigned char);
-extern void corner(const unsigned char*);
+extern void corner(unsigned char*,const unsigned char*);
 
 #endif
 
