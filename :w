@@ -67,11 +67,8 @@ void corner(unsigned char *out,const unsigned char *in)
 	while(i<length)			/* compute I2x,I2y,Ixy */
 	{
 		I2x[i] = (signed int)Ix[i] * (signed int)Ix[i];
-		I2x_g[i] = I2x[i];
 		I2y[i] = (signed int)Iy[i] * (signed int)Iy[i];
-		I2y_g[i] = I2y[i];
 		Ixy[i] = (signed int)Ix[i] * (signed int)Iy[i];
-		Ixy_g[i] = Ixy[i];
 		i++;
 	}
 
@@ -83,10 +80,20 @@ void corner(unsigned char *out,const unsigned char *in)
 	while(i<length)				/* compute the response function */
 	{					/* A = I2x_g, B = I2y_g, C = Ixy_g */
 		rps[i] = (int)(I2x_g[i] * I2y_g[i] - Ixy_g[i] * Ixy_g[i])/
-			(I2x_g[i] + I2y_g[i]);
+			(I2x_g[i] + I2y_g[i] + 0.000001);
 		
 		i++;				/* M = [A,C,C,B] ,R = AB-C^2-k(A+B)^2 */
 	}
+
+#if 0
+	i = 0;
+	while(i<length)				/* get the max rps value */
+	{
+		if(rps[i]>rp_max)	
+			rp_max = rps[i];
+		i++;
+	}
+#endif
 
 	i = 0;
 	j = 0;
@@ -99,7 +106,7 @@ void corner(unsigned char *out,const unsigned char *in)
 				result[ct_index(i,j)] = CORN_FLAG;		
 				counts++;
 				fprintf(stdout,"==total %d==(%d,%d)\n",counts,i,j);
-				out[bfh.offBits+ct_index(i,j)] = 0xFF;
+				out[ct_index(i,j)] = 0xFF;
 			}
 			j++;
 		}
@@ -125,7 +132,7 @@ static void Gaussian(signed int *out,const signed int *in)
 {
 	int handle_w = bih.width - 2;	
 	int handle_h = bih.height - 2;
-	int i = 0,j = 0;
+	int i = 0,j = 0,m = 0,n =0;
 	int gauss_w = GAUSS_W>>1;
 	double quot_gau[GAUSS_W][GAUSS_W];
 
@@ -147,9 +154,9 @@ static void Gaussian(signed int *out,const signed int *in)
 	i = 0;
 	j = 0;
 
-	while(i<handle_h-2)
+	while(i<handle_h)
 	{
-		while(j<handle_w-2)
+		while(j<handle_w)
 		{
 #if 0
 			out[ct_index(i,j)] = NORMAL*(in[ct_index(i-1,j-1)]*gauss_m[0][0] + 
@@ -162,44 +169,30 @@ static void Gaussian(signed int *out,const signed int *in)
 						in[ct_index(i+1,j)]*gauss_m[2][1] +
 						in[ct_index(i+1,j+1)]*gauss_m[2][2]);
 #else
-				gauss_compute(out,in,quot_gau,i,j);
+				gauss_compute(out,quot_gau,i,j);
 #endif
 			j++;
 		}
+		
 		j = 0;
 		i++;
 	}
 	return;
 }
 
-static void gauss_compute(int *out,const int* in,double (*guass_tp)[GAUSS_W],int m,int n)
+static void gauss_compute(int *out,double **guass_tp,int m,int n)
 {
 	int i = 0,j = 0;
 	int width = GAUSS_W>>1;
 	
+	out[m][n] = 0;
+
 	while(i<GAUSS_W)
 	{
 		while(j<GAUSS_W)
 		{
-			if(-1>=m-width+i)
-			{
-				if(-1>=m-width+j)
-					out[ct_index(m,n)] += 
-					(int)((double)in[ct_index(-1,-1)]*guass_tp[i][j]);
-				else
-					out[ct_index(m,n)] += 
-					(int)((double)in[ct_index(-1,n-width+j)]*guass_tp[i][j]);
-
-			}
-			else
-			{
-				if(-1>=m-width+j)
-					out[ct_index(m,n)] += 
-					(int)((double)in[ct_index(m-width+i,-1)]*guass_tp[i][j]);
-				else
-					out[ct_index(m,n)] += 
-					(int)((double)in[ct_index(m-width+i,n-width+j)]*guass_tp[i][j]);
-			}
+			out[ct_index(m,n)] += 
+			out[ct_index(m-width+i,n-witdh+j)]*guass_tp[i][j];
 			j++;
 		}
 		j = 0;
@@ -222,7 +215,7 @@ static int local_max(int *rps,int i,int j)
 				m++;
 				continue;
 			}
-			if(rps[ct_index(i,j)]<=rps[ct_index(i+n,j+m)])
+			if(rps[ct_index(i,j)]-rps[ct_index(i+n,j+m)]<=0.000001)
 				return 0;
 			m++;
 		}
