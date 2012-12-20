@@ -44,7 +44,7 @@ signed int gray(unsigned char *bmp_out,const unsigned char *bmp_in)
 
 		while(i<CCOUNT8)	/* build gray color table */ 
 		{
-#if 0
+#if 1
 			colors[sizeof(struct BMP_colors)*i] = i;	
 			colors[sizeof(struct BMP_colors)*i+1] = i;	
 			colors[sizeof(struct BMP_colors)*i+2] = i;	

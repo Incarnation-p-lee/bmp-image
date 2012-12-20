@@ -22,15 +22,15 @@ void corner(unsigned char *out,const unsigned char *in)
 {
 	signed int *I2x,*I2y,*Ixy,*I2x_g,*I2y_g,*Ixy_g;
 	int *rps;
-	unsigned char *Ix;
-	unsigned char *Iy;
+	signed char *Ix;
+	signed char *Iy;
 	int length = bih.width*bih.height,i = 0,j = 0;
 	int handle_w = bih.width;
 	int handle_h = bih.height;
 	int *result,counts = 0;;
 
-	Ix = (unsigned char *)malloc(length*sizeof(unsigned char));
-	Iy = (unsigned char *)malloc(length*sizeof(unsigned char));
+	Ix = (signed char *)malloc(length*sizeof(unsigned char));
+	Iy = (signed char *)malloc(length*sizeof(unsigned char));
 	I2x = (signed int*)malloc(length*sizeof(signed int));
 	I2y = (signed int*)malloc(length*sizeof(signed int));
 	Ixy = (signed int*)malloc(length*sizeof(signed int));
@@ -66,14 +66,16 @@ void corner(unsigned char *out,const unsigned char *in)
 	i = 0;
 	while(i<length)			/* compute I2x,I2y,Ixy */
 	{
-		I2x[i] = (signed int)Ix[i] * (signed int)Ix[i];
+		I2x[i] = Ix[i] * Ix[i];
+		I2y[i] = Iy[i] * Iy[i];
+		Ixy[i] = Ix[i] * Iy[i];
+		
 		I2x_g[i] = I2x[i];
-		I2y[i] = (signed int)Iy[i] * (signed int)Iy[i];
 		I2y_g[i] = I2y[i];
-		Ixy[i] = (signed int)Ix[i] * (signed int)Iy[i];
 		Ixy_g[i] = Ixy[i];
 		i++;
 	}
+	
 
 	Gaussian(I2x_g,I2x);			/* Gaussian */
 	Gaussian(I2y_g,I2y);
@@ -82,8 +84,8 @@ void corner(unsigned char *out,const unsigned char *in)
 	i = 0;
 	while(i<length)				/* compute the response function */
 	{					/* A = I2x_g, B = I2y_g, C = Ixy_g */
-		rps[i] = (int)(I2x_g[i] * I2y_g[i] - Ixy_g[i] * Ixy_g[i])/
-			(I2x_g[i] + I2y_g[i]);
+		rps[i] = (int)((I2x_g[i] * I2y_g[i] - Ixy_g[i] * Ixy_g[i])/
+			(I2x_g[i] + I2y_g[i]));
 		
 		i++;				/* M = [A,C,C,B] ,R = AB-C^2-k(A+B)^2 */
 	}
@@ -147,9 +149,9 @@ static void Gaussian(signed int *out,const signed int *in)
 	i = 0;
 	j = 0;
 
-	while(i<handle_h-2)
+	while(i<handle_h)
 	{
-		while(j<handle_w-2)
+		while(j<handle_w)
 		{
 #if 0
 			out[ct_index(i,j)] = NORMAL*(in[ct_index(i-1,j-1)]*gauss_m[0][0] + 
@@ -176,6 +178,8 @@ static void gauss_compute(int *out,const int* in,double (*guass_tp)[GAUSS_W],int
 {
 	int i = 0,j = 0;
 	int width = GAUSS_W>>1;
+
+	out[ct_index(m,n)] = 0;
 	
 	while(i<GAUSS_W)
 	{
