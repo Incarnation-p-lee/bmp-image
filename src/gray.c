@@ -84,9 +84,9 @@ static void bmp_ct(unsigned char *out,const unsigned char *in,unsigned int index
 	while(i++<length)
 	{
 		out[index++] = (unsigned char)(
-				pRED*in[b_in] +
-				pGREEN*in[b_in+1] +
-				pBLUE*in[b_in+2]);
+				pRED*(double)in[b_in] +
+				pGREEN*(double)in[b_in+1] +
+				pBLUE*(double)in[b_in+2]);
 		b_in += 3;
 	}
 	return;

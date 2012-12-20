@@ -100,7 +100,7 @@ void corner(unsigned char *out,const unsigned char *in)
 			{
 				result[ct_index(i,j)] = CORN_FLAG;		
 				counts++;
-				fprintf(stdout,"==total %d==(%d,%d)\n",counts,i,j);
+				fprintf(stdout,"==total %d==(%d,%d),[%d]\n",counts,i,j,ct_index(i,j));
 				out[bfh.offBits+ct_index(i,j)] = 0xFF;
 			}
 			j++;
@@ -108,6 +108,15 @@ void corner(unsigned char *out,const unsigned char *in)
 		j = 0;
 		i++;
 	}
+
+#if 1
+	i = 0;
+	while(i<320)
+		out[bfh.offBits+i++] = 0xFF;
+	i = 0;
+	while(i<320)
+		out[bfh.offBits+640+i++] = 0xFF;
+#endif
 	
 	free(Ix);
 	free(Iy);
