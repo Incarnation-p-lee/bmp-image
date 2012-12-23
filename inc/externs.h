@@ -14,6 +14,7 @@ extern void head_cpy(unsigned char*);
 extern void head_read(const unsigned char*);
 extern signed int matrix(const unsigned char *,unsigned int,unsigned int,unsigned char);
 extern void corner(unsigned char*,const unsigned char*);
+extern unsigned int point_to_bytes(int,int);
 
 #endif
 

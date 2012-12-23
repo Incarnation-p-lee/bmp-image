@@ -16,7 +16,7 @@ all:$(TAR)
 
 
 $(TAR):$(OBJ)
-	$(CC) $(INC) $(LF) -o $@ $^ $(LIB)
+	$(CC) $(INC) -o $@ $^ $(LIB)
 
 $(OBJ):%.o:%.c
 	$(CC) $(INC) $(CF) -o $@ $<

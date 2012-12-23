@@ -52,8 +52,6 @@ int main()
 	gradient(grad_bmp,gray_bmp,0);		/* gradient, edger detector */
 	fwrite(grad_bmp,bfh.size,1,fpg);
 
-	memcpy(corn_bmp,gray_bmp,bfh.size);
-	memset(&corn_bmp[bfh.offBits],0x0,bih.width*bih.height);
 	corner(corn_bmp,gray_bmp);
 	fwrite(corn_bmp,bfh.size,1,fpc);
 

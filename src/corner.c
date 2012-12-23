@@ -24,36 +24,43 @@ void corner(unsigned char *out,const unsigned char *in)
 	int *rps;
 	signed char *Ix;
 	signed char *Iy;
-	int length = bih.width*bih.height,i = 0,j = 0;
+	int length = bih.width*bih.height,i,j;
 	int handle_w = bih.width;
 	int handle_h = bih.height;
 	int *result,counts = 0;;
 
-	Ix = (signed char *)malloc(length*sizeof(unsigned char));
-	Iy = (signed char *)malloc(length*sizeof(unsigned char));
-	I2x = (signed int*)malloc(length*sizeof(signed int));
-	I2y = (signed int*)malloc(length*sizeof(signed int));
-	Ixy = (signed int*)malloc(length*sizeof(signed int));
-	I2x_g = (signed int*)malloc(length*sizeof(signed int));
-	I2y_g = (signed int*)malloc(length*sizeof(signed int));
-	Ixy_g = (signed int*)malloc(length*sizeof(signed int));
-	rps = (int*)malloc(length*sizeof(int));
-	result = (int*)malloc(length*sizeof(int));
+	head_cpy(out);										/* copy the bmp header */
+	
+	if(24!=bih.bitcount)								/* copy the color table */
+		memcpy(&out[HEAD_SIZE],&in[HEAD_SIZE],bfh.offBits - HEAD_SIZE);
 
-	memcpy(Ix,&in[bfh.offBits],length);
-	memcpy(Iy,&in[bfh.offBits],length);
-	memset(I2x,0,sizeof(signed int)*length);
-	memset(I2y,0,sizeof(signed int)*length);
-	memset(Ixy,0,sizeof(signed int)*length);
-	memset(I2x_g,0,sizeof(signed int)*length);
-	memset(I2y_g,0,sizeof(signed int)*length);
-	memset(Ixy_g,0,sizeof(signed int)*length);
-	memset(rps,0,sizeof(int)*length);
-	memset(result,0,sizeof(int)*length);
+	Ix = (signed char *)malloc(length*sizeof(Ix[0]));
+	Iy = (signed char *)malloc(length*sizeof(Iy[0]));
+	I2x = (signed int*)malloc(length*sizeof(I2x[0]));
+	I2y = (signed int*)malloc(length*sizeof(I2y[0]));
+	Ixy = (signed int*)malloc(length*sizeof(Ixy[0]));
+	I2x_g = (signed int*)malloc(length*sizeof(I2x_g[0]));
+	I2y_g = (signed int*)malloc(length*sizeof(I2y_g[0]));
+	Ixy_g = (signed int*)malloc(length*sizeof(Ixy_g[0]));
+	rps = (int*)malloc(length*sizeof(rps[0]));
+	result = (int*)malloc(length*sizeof(result[0]));
 
-	while(i<handle_h-2)		/* compute Ix,Iy */
+	memset(Ix,0,sizeof(Ix[0])*length);
+	memset(Iy,0,sizeof(Iy[0])*length);
+	memset(I2x,0,sizeof(I2x[0])*length);
+	memset(I2y,0,sizeof(I2y[0])*length);
+	memset(Ixy,0,sizeof(Ixy[0])*length);
+	memset(I2x_g,0,sizeof(I2x_g[0])*length);
+	memset(I2y_g,0,sizeof(I2y_g[0])*length);
+	memset(Ixy_g,0,sizeof(Ixy_g[0])*length);
+	memset(rps,0,sizeof(rps[0])*length);
+	memset(result,0,sizeof(result[0])*length);
+
+	i = 0;
+	j = 0;
+	while(i<handle_h)		/* compute Ix,Iy */
 	{
-		while(j<handle_w-2)
+		while(j<handle_w)
 		{
 			Ix[ct_index(i,j)] = matrix(in,i,j,XD);
 			Iy[ct_index(i,j)] = matrix(in,i,j,YD);
@@ -70,9 +77,6 @@ void corner(unsigned char *out,const unsigned char *in)
 		I2y[i] = Iy[i] * Iy[i];
 		Ixy[i] = Ix[i] * Iy[i];
 		
-		I2x_g[i] = I2x[i];
-		I2y_g[i] = I2y[i];
-		Ixy_g[i] = Ixy[i];
 		i++;
 	}
 	
@@ -92,9 +96,9 @@ void corner(unsigned char *out,const unsigned char *in)
 
 	i = 0;
 	j = 0;
-	while(i<handle_h-2)
+	while(i<handle_h)
 	{
-		while(j<handle_w-2)
+		while(j<handle_w)
 		{
 			if(rps[ct_index(i,j)]>THRESH && LOCAL_MAX==local_max(rps,i,j))
 			{
@@ -109,7 +113,7 @@ void corner(unsigned char *out,const unsigned char *in)
 		i++;
 	}
 
-#if 1
+#if 0
 	i = 0;
 	while(i<320)
 		out[bfh.offBits+i++] = 0xFF;
@@ -194,21 +198,21 @@ static void gauss_compute(int *out,const int* in,double (*guass_tp)[GAUSS_W],int
 	{
 		while(j<GAUSS_W)
 		{
-			if(-1>=m-width+i)
+			if(0>m-width+i)
 			{
-				if(-1>=m-width+j)
+				if(0>m-width+j)
 					out[ct_index(m,n)] += 
-					(int)((double)in[ct_index(-1,-1)]*guass_tp[i][j]);
+					(int)((double)in[ct_index(0,0)]*guass_tp[i][j]);
 				else
 					out[ct_index(m,n)] += 
-					(int)((double)in[ct_index(-1,n-width+j)]*guass_tp[i][j]);
+					(int)((double)in[ct_index(0,n-width+j)]*guass_tp[i][j]);
 
 			}
 			else
 			{
-				if(-1>=m-width+j)
+				if(0>m-width+j)
 					out[ct_index(m,n)] += 
-					(int)((double)in[ct_index(m-width+i,-1)]*guass_tp[i][j]);
+					(int)((double)in[ct_index(m-width+i,0)]*guass_tp[i][j]);
 				else
 					out[ct_index(m,n)] += 
 					(int)((double)in[ct_index(m-width+i,n-width+j)]*guass_tp[i][j]);
@@ -223,7 +227,6 @@ static void gauss_compute(int *out,const int* in,double (*guass_tp)[GAUSS_W],int
 
 static int local_max(int *rps,int i,int j)
 {
-#if 1
 	int depth = WINDOW_W;
 	signed int n = -WINDOW_W,m = -WINDOW_W;
 	while(n<=depth)
@@ -243,44 +246,19 @@ static int local_max(int *rps,int i,int j)
 		n++;
 	}
 	return LOCAL_MAX;
-#else
-	if(	rps[ct_index(i,j)] + 0.00001 > rps[ct_index(i-2,j-2)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i-2,j-1)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i-2,j)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i-2,j+1)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i-2,j+2)] &&
-
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i-1,j-2)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i-1,j-1)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i-1,j)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i-1,j+1)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i-1,j+2)] &&
-
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i,j-2)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i,j-1)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i,j+1)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i,j+2)] &&
-
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i+1,j-2)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i+1,j-1)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i+1,j)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i+1,j+1)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i+1,j+2)] &&
-
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i+2,j-2)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i+2,j-1)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i+2,j)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i+2,j+1)] &&
-		rps[ct_index(i,j)] + 0.00001> rps[ct_index(i+2,j+2)])
-
-		return LOCAL_MAX;
-	return 0;
-#endif
 }
 
-static int ct_index(int i,int j)
+static unsigned int ct_index(int m,int n)
 {
-	return (int)((i+1)*bih.width + j + 1);
+	int i = m, j = n;
+
+	if(0>i)
+		i = 0;
+
+	if(0>j)
+		j = 0;
+
+	return (unsigned int)(point_to_bytes(i,j) - bfh.offBits);
 }
 
 /*

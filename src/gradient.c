@@ -20,10 +20,10 @@
 
 signed int gradient(unsigned char *bmp_out,const unsigned char *bmp_in,unsigned char director)
 {
-	head_cpy(bmp_out);
+	head_cpy(bmp_out);									/* copy the bmp header */
 	
-	if(24!=bih.bitcount)
-		memcpy(bmp_out,bmp_in,bfh.offBits - HEAD_SIZE);
+	if(24!=bih.bitcount)								/* copy the color table */
+		memcpy(&bmp_out[HEAD_SIZE],&bmp_in[HEAD_SIZE],bfh.offBits - HEAD_SIZE);
 	
 	gdt_xy(bmp_out,bmp_in,director);
 
@@ -36,8 +36,8 @@ signed int gradient(unsigned char *bmp_out,const unsigned char *bmp_in,unsigned 
 */
 static void gdt_xy(unsigned char *out,const unsigned char *in,unsigned char director)
 {
-	unsigned int handle_h = bih.height - 2;
-	unsigned int handle_w = bih.width - 2;
+	unsigned int handle_h = bih.height;
+	unsigned int handle_w = bih.width;
 	int i = 0,j = 0;
 	
 	while(i<handle_h)
@@ -55,9 +55,16 @@ static void gdt_xy(unsigned char *out,const unsigned char *in,unsigned char dire
 }
 
 
-static unsigned int point_to_bytes(unsigned int i,unsigned int j)
+unsigned int point_to_bytes(int m,int n)
 {
-	return (unsigned int)(bfh.offBits + (bih.width*(i+1) + j + 1)*(bih.bitcount>>3));
+	int i = m, j = n;
+
+	if(0>i)		/* if out of range set to  zero */
+		i = 0;
+	if(0>j)
+		j = 0;
+
+	return (unsigned int)(bfh.offBits + (bih.height - i - 1)*bih.width + j);
 }
 
 
@@ -67,15 +74,19 @@ signed int matrix(const unsigned char *in,unsigned int i,unsigned int j,unsigned
 	if(0x55==director)
 	{
 		result = Sx[0][2]*in[point_to_bytes(i-1,j+1)] + Sx[0][0]*in[point_to_bytes(i-1,j-1)]+
-			Sx[1][2]*in[point_to_bytes(i,j+1)] + Sx[1][0]*in[point_to_bytes(i,j-1)]+ 
-			Sx[2][2]*in[point_to_bytes(i+1,j+1)] + Sx[2][0]*in[point_to_bytes(i+1,j-1)];
+					Sx[1][2]*in[point_to_bytes(i,j+1)] + Sx[1][0]*in[point_to_bytes(i,j-1)]+ 
+					Sx[2][2]*in[point_to_bytes(i+1,j+1)] + Sx[2][0]*in[point_to_bytes(i+1,j-1)];
+		if(0==result)
+			result++;
 	}
 
 	if(0xAA==director)	
 	{
 		result = Sy[2][0]*in[point_to_bytes(i+1,j-1)] + Sy[0][0]*in[point_to_bytes(i-1,j-1)]+
-			Sy[2][1]*in[point_to_bytes(i+1,j)] + Sy[0][1]*in[point_to_bytes(i-1,j)]+
-			Sy[2][2]*in[point_to_bytes(i+1,j+1)] + Sy[0][2]*in[point_to_bytes(i-1,j+1)];
+					Sy[2][1]*in[point_to_bytes(i+1,j)] + Sy[0][1]*in[point_to_bytes(i-1,j)]+
+					Sy[2][2]*in[point_to_bytes(i+1,j+1)] + Sy[0][2]*in[point_to_bytes(i-1,j+1)];
+		if(0==result)
+			result++;
 	}
 
 	return result;
