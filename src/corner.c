@@ -138,14 +138,14 @@ void corner(unsigned char *out,const unsigned char *in)
 
 static void Gaussian(signed int *out,const signed int *in)
 {
-	int handle_w = bih.width - 2;	
-	int handle_h = bih.height - 2;
+	int handle_w = bih.width;	
+	int handle_h = bih.height;
 	int i = 0,j = 0;
 	int gauss_w = GAUSS_W>>1;
 	double quot_gau[GAUSS_W][GAUSS_W];
 
 
-	while(i<GAUSS_W)
+	while(i<GAUSS_W)   /* this cycle need rewrite, because there is no need to compute more than twice */
 	{
 		while(j<GAUSS_W)
 		{
@@ -177,7 +177,10 @@ static void Gaussian(signed int *out,const signed int *in)
 						in[ct_index(i+1,j)]*gauss_m[2][1] +
 						in[ct_index(i+1,j+1)]*gauss_m[2][2]);
 #else
-				gauss_compute(out,in,quot_gau,i,j);
+				if(478==i)
+					gauss_compute(out,in,quot_gau,i,j);
+				else
+					gauss_compute(out,in,quot_gau,i,j);
 #endif
 			j++;
 		}
@@ -250,15 +253,7 @@ static int local_max(int *rps,int i,int j)
 
 static unsigned int ct_index(int m,int n)
 {
-	int i = m, j = n;
-
-	if(0>i)
-		i = 0;
-
-	if(0>j)
-		j = 0;
-
-	return (unsigned int)(point_to_bytes(i,j) - bfh.offBits);
+	return (unsigned int)(point_to_bytes(m,n) - bfh.offBits);
 }
 
 /*

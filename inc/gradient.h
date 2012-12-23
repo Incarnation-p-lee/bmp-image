@@ -16,7 +16,7 @@ signed int matrix(const unsigned char *,unsigned int,unsigned int,unsigned char)
 unsigned int point_to_bytes(int,int);
 
 #if 1
-static int Sx[3][3] = {{-1,0,2},{-1,0,3},{-1,0,2},};
+static int Sx[3][3] = {{-1,0,2},{-1,0,2},{-1,0,2},};
 #else
 static int Sx[3][3] = {{-1,0,1},{-1,0,1},{-1,0,1},};
 #endif
