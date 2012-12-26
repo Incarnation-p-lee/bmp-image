@@ -81,6 +81,7 @@ void corner(unsigned char *out,const unsigned char *in)
 	}
 	
 
+	gauss_init();
 	Gaussian(I2x_g,I2x);			/* Gaussian */
 	Gaussian(I2y_g,I2y);
 	Gaussian(Ixy_g,Ixy);
@@ -136,16 +137,11 @@ void corner(unsigned char *out,const unsigned char *in)
 	return;
 }
 
-static void Gaussian(signed int *out,const signed int *in)
+static void gauss_init()
 {
-	int handle_w = bih.width;	
-	int handle_h = bih.height;
-	int i = 0,j = 0;
+	int i = 0, j = 0;
 	int gauss_w = GAUSS_W>>1;
-	double quot_gau[GAUSS_W][GAUSS_W];
-
-
-	while(i<GAUSS_W)   /* this cycle need rewrite, because there is no need to compute more than twice */
+	while(i<GAUSS_W)  
 	{
 		while(j<GAUSS_W)
 		{
@@ -157,10 +153,14 @@ static void Gaussian(signed int *out,const signed int *in)
 		j = 0;
 		i++;
 	}
+	return;
+}
 
-
-	i = 0;
-	j = 0;
+static void Gaussian(signed int *out,const signed int *in)
+{
+	int handle_w = bih.width;	
+	int handle_h = bih.height;
+	int i = 0,j = 0;
 
 	while(i<handle_h)
 	{
@@ -256,9 +256,3 @@ static unsigned int ct_index(int m,int n)
 	return (unsigned int)(point_to_bytes(m,n) - bfh.offBits);
 }
 
-/*
-static void index_ct(int *i,int *j,int index)
-{
-	*i = (int)((index - 1)/bih.width) - 1;
-	*j = (index - 1)%bih.width;
-}*/

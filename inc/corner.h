@@ -20,16 +20,11 @@
 void corner(unsigned char*,const unsigned char*);
 static unsigned int ct_index(int,int);
 static int local_max(int*,int,int);
-/*static void index_ct(int*,int*,int);*/
 static void gauss_compute(int*,const int*,double (*)[GAUSS_W],int,int);
 static void Gaussian(signed int*,const signed int*);
+static void gauss_init();
 
-/*
-static int gauss_m[3][3] = {
-		{1,2,1},
-		{2,4,2},
-		{1,2,1},};
-*/
+static double quot_gau[GAUSS_W][GAUSS_W];
 
 #endif
   
