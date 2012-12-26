@@ -104,7 +104,7 @@ void corner(unsigned char *out,const unsigned char *in)
 			{
 				result[ct_index(i,j)] = CORN_FLAG;		
 				counts++;
-				fprintf(stdout,"==total %d==(%d,%d),[%d]\n",counts,i,j,ct_index(i,j));
+				fprintf(stdout,"==total %d==(%d,%d),[%d]\n",counts,i,j,rps[ct_index(i,j)]);
 				out[bfh.offBits+ct_index(i,j)] = 0xFF;
 			}
 			j++;

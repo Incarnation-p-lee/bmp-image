@@ -29,6 +29,7 @@ int main()
 	fpi = fopen("./source/1.bmp","rb");
 	fpo = fopen("./source/1.gray.bmp","wb");
 	fpg = fopen("./source/1.grad.bmp","wb");
+	fpc = fopen("./source/1.corn.bmp","wb");
 #else
 	fpi = fopen("./source/2.bmp","rb");
 	fpo = fopen("./source/2.gray.bmp","wb");
