@@ -177,9 +177,6 @@ static void Gaussian(signed int *out,const signed int *in)
 						in[ct_index(i+1,j)]*gauss_m[2][1] +
 						in[ct_index(i+1,j+1)]*gauss_m[2][2]);
 #else
-				if(478==i)
-					gauss_compute(out,in,quot_gau,i,j);
-				else
 					gauss_compute(out,in,quot_gau,i,j);
 #endif
 			j++;
@@ -249,10 +246,5 @@ static int local_max(int *rps,int i,int j)
 		n++;
 	}
 	return LOCAL_MAX;
-}
-
-static unsigned int ct_index(int m,int n)
-{
-	return (unsigned int)(point_to_bytes(m,n) - bfh.offBits);
 }
 

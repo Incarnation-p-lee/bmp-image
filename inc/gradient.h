@@ -13,7 +13,6 @@
 signed int gradient(unsigned char *,const unsigned char *,unsigned char);
 static void gdt_xy(unsigned char*,const unsigned char*,unsigned char);
 signed int matrix(const unsigned char *,unsigned int,unsigned int,unsigned char);
-unsigned int point_to_bytes(int,int);
 
 #if 0
 static int Sx[3][3] = {{-2,0,3},{-2,0,3},{-2,0,3},};

@@ -54,24 +54,6 @@ static void gdt_xy(unsigned char *out,const unsigned char *in,unsigned char dire
 	return;
 }
 
-
-unsigned int point_to_bytes(int m,int n)
-{
-	int i = m, j = n;
-
-	if(0>i)		/* if out of range set to  zero */
-		i = 0;
-	if(0>j)
-		j = 0;
-	if(bih.height<=i)
-		i = bih.height - 1;
-	if(bih.width<=j)
-		i = bih.width - 1;
-
-	return (unsigned int)(bfh.offBits + (bih.height - i - 1)*bih.width + j);
-}
-
-
 signed int matrix(const unsigned char *in,unsigned int i,unsigned int j,unsigned char director)
 {
 	signed int result = 0;

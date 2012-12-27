@@ -41,6 +41,41 @@ void head_read(const unsigned char *bmp_in)
 	return;
 }
 
+void mark_point(unsigned char *out,int *mask)
+{
+	int i = 0, j = 0;
+	while(i<bih.height)
+	{
+		while(j<bih.width)
+		{
+			if(CORN_FLAG==mask[i])
+				;
+		}
+	}
+}
 
+static void mark_paint(unsigned char *out,int i,int j)
+{
+	return;
+}
 
+unsigned int ct_index(int m,int n)
+{
+	return (unsigned int)(point_to_bytes(m,n) - bfh.offBits);
+}
 
+unsigned int point_to_bytes(int m,int n)
+{
+	int i = m, j = n;
+
+	if(0>i)		/* if out of range set to  zero */
+		i = 0;
+	if(0>j)
+		j = 0;
+	if(bih.height<=i)
+		i = bih.height - 1;
+	if(bih.width<=j)
+		i = bih.width - 1;
+
+	return (unsigned int)(bfh.offBits + (bih.height - i - 1)*bih.width + j);
+}

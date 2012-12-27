@@ -12,6 +12,7 @@
 
 #define XD 0x55
 #define YD 0xAA
+#define CORN_FLAG 0xFF
 
 #define BITCOUNT(n)	((unsigned int)1<<(n))
 
