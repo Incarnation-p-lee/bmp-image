@@ -12,7 +12,7 @@
 #define WINDOW_W	5
 #define GAUSS_W		7
 #define GAUSS_D		1.8
-#define THRESH		12000
+#define THRESH		8000
 #define WEIGHT_MAX	0.01
 #define LOCAL_MAX 	0xA5
 #define CORN_FLAG	0xFF
