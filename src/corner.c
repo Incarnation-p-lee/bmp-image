@@ -18,7 +18,7 @@
 #include "udglobal.h"
   
 
-void corner(unsigned char *out,const unsigned char *in)
+void corner(unsigned char *out_result,unsigned char *out_gy,const unsigned char *in)
 {
 	signed int *I2x,*I2y,*Ixy,*I2x_g,*I2y_g,*Ixy_g;
 	int *rps;
@@ -27,12 +27,12 @@ void corner(unsigned char *out,const unsigned char *in)
 	int length = bih.width*bih.height,i,j;
 	int handle_w = bih.width;
 	int handle_h = bih.height;
-	int *result,counts = 0;;
+	int counts = 0,*result;
 
-	head_cpy(out);										/* copy the bmp header */
+	head_cpy(out_gy);										/* copy the bmp header */
 	
 	if(24!=bih.bitcount)								/* copy the color table */
-		memcpy(&out[HEAD_SIZE],&in[HEAD_SIZE],bfh.offBits - HEAD_SIZE);
+		memcpy(&out_gy[HEAD_SIZE],&in[HEAD_SIZE],bfh.offBits - HEAD_SIZE);
 
 	Ix = (signed char *)malloc(length*sizeof(Ix[0]));
 	Iy = (signed char *)malloc(length*sizeof(Iy[0]));
@@ -106,22 +106,15 @@ void corner(unsigned char *out,const unsigned char *in)
 				result[ct_index(i,j)] = CORN_FLAG;		
 				counts++;
 				fprintf(stdout,"==total %d==(%d,%d),[%d]\n",counts,i,j,rps[ct_index(i,j)]);
-				out[bfh.offBits+ct_index(i,j)] = 0xFF;
+				out_gy[bfh.offBits+ct_index(i,j)] = 0xFF;
 			}
 			j++;
 		}
 		j = 0;
 		i++;
 	}
-
-#if 0
-	i = 0;
-	while(i<320)
-		out[bfh.offBits+i++] = 0xFF;
-	i = 0;
-	while(i<320)
-		out[bfh.offBits+640+i++] = 0xFF;
-#endif
+	
+	mark_point(out_result,result);
 	
 	free(Ix);
 	free(Iy);
@@ -165,22 +158,7 @@ static void Gaussian(signed int *out,const signed int *in)
 	while(i<handle_h)
 	{
 		while(j<handle_w)
-		{
-#if 0
-			out[ct_index(i,j)] = NORMAL*(in[ct_index(i-1,j-1)]*gauss_m[0][0] + 
-						in[ct_index(i-1,j)]*gauss_m[0][1] +
-						in[ct_index(i-1,j+1)]*gauss_m[0][2] +
-						in[ct_index(i,j-1)]*gauss_m[1][0] +
-						in[ct_index(i,j)]*gauss_m[1][1] +
-						in[ct_index(i,j+1)]*gauss_m[1][2] +
-						in[ct_index(i+1,j-1)]*gauss_m[2][0] +
-						in[ct_index(i+1,j)]*gauss_m[2][1] +
-						in[ct_index(i+1,j+1)]*gauss_m[2][2]);
-#else
-					gauss_compute(out,in,quot_gau,i,j);
-#endif
-			j++;
-		}
+			gauss_compute(out,in,quot_gau,i,j++);
 		j = 0;
 		i++;
 	}

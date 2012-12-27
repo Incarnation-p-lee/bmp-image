@@ -48,14 +48,35 @@ void mark_point(unsigned char *out,int *mask)
 	{
 		while(j<bih.width)
 		{
-			if(CORN_FLAG==mask[i])
-				;
+			if(CORN_FLAG==mask[ct_index(i,j)])
+				mark_paint(out,i,j);
+			j++;
 		}
+		j = 0;
+		i++;
 	}
+	return;
 }
 
 static void mark_paint(unsigned char *out,int i,int j)
 {
+	int n = -MARK_W; 
+	while(n<=MARK_W)	/* 0d44fd rgb*/
+	{
+		out[HEAD_SIZE + 3*ct_index(i,j+n)] = 0xFD;		/* B */
+		out[HEAD_SIZE + 3*ct_index(i,j+n) + 1] = 0xD6;	/* G */
+		out[HEAD_SIZE + 3*ct_index(i,j+n) + 2] = 0x1C;	/* R */
+		n++;
+	}
+	
+	n = -MARK_W;
+	while(n<=MARK_W)	
+	{
+		out[HEAD_SIZE + 3*ct_index(i+n,j)] = 0xFD;
+		out[HEAD_SIZE + 3*ct_index(i+n,j) + 1] = 0xD6;
+		out[HEAD_SIZE + 3*ct_index(i+n,j) + 2] = 0x1C;
+		n++;
+	}
 	return;
 }
 

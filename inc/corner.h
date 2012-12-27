@@ -16,7 +16,7 @@
 #define WEIGHT_MAX	0.01
 #define LOCAL_MAX 	0xA5
 
-void corner(unsigned char*,const unsigned char*);
+void corner(unsigned char*,unsigned char*,const unsigned char*);
 static int local_max(int*,int,int);
 static void gauss_compute(int*,const int*,double (*)[GAUSS_W],int,int);
 static void Gaussian(signed int*,const signed int*);

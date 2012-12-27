@@ -11,6 +11,8 @@
 
 #include "udglobal.h"
 
+#define MARK_W 4
+
 void head_cpy(unsigned char*);
 void head_read(const unsigned char*);
 void mark_point(unsigned char*,int*);
