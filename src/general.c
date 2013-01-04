@@ -96,7 +96,7 @@ unsigned int point_to_bytes(int m,int n)
 	if(bih.height<=i)
 		i = bih.height - 1;
 	if(bih.width<=j)
-		i = bih.width - 1;
+		j = bih.width - 1;
 
 	return (unsigned int)(bfh.offBits + (bih.height - i - 1)*bih.width + j);
 }
